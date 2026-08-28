@@ -1,26 +1,33 @@
 <script>
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+  const nodes = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-reveal]')
+  );
 
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const supported = typeof IntersectionObserver !== 'undefined';
 
-  if (nodes.length && supported && !reducedMotion) {
-    for (const [i, node] of nodes.entries()) {
-      node.classList.add('is-hidden');
-      node.style.transitionDelay = `${(i % 4) * 60}ms`;
+  // site.css hides [data-reveal] up front whenever scripting is on, so every
+  // path through here has to end with the nodes shown -- otherwise the page
+  // stays blank.
+  if (nodes.length) {
+    if (reducedMotion) {
+      for (const node of nodes) node.classList.add('is-shown');
+    } else {
+      for (const [i, node] of nodes.entries()) {
+        node.style.transitionDelay = `${(i % 4) * 60}ms`;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-shown');
+            observer.unobserve(entry.target);
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+      );
+
+      for (const node of nodes) observer.observe(node);
     }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.remove('is-hidden');
-          observer.unobserve(entry.target);
-        }
-      },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
-    );
-
-    for (const node of nodes) observer.observe(node);
   }
 </script>

@@ -5,7 +5,7 @@ year: "2026"
 role: Solo — assistant progressive test
 shot: timeline + chatroom
 repo: https://github.com/HappyNaCl/ay-com
-cover: ./ay-com-cover.png
+cover: ./ay-com-cover.webp
 coverAlt: Home/Feeds page
 stack:
   - Go

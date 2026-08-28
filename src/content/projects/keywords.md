@@ -5,7 +5,7 @@ year: "2026"
 role: Solo — side project
 shot: daily board + leaderboard
 repo: https://github.com/HappyNaCl/keYworDs
-cover: ./keywords-cover.png
+cover: ./keywords-cover.webp
 coverAlt: Game page
 stack:
   - NestJS

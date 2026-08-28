@@ -1,20 +1,21 @@
 ---
-const email = 'yuyudhistira0@gmail.com';
+import { site } from '../data/site';
 ---
 
 <section id="contact" class="section contact">
   <div class="panel" data-reveal>
-    <h2 class="heading">Got something that needs to stay up?</h2>
+    <h2 class="heading">Get in touch</h2>
     <p class="blurb">
-      Contract, full-time, or a one-off pipeline rescue. I reply within a day.
+      Currently open to DevOps and platform roles.
+      If you're hiring or just want to compare notes on cluster pain, my inbox is open.
     </p>
 
     <div class="actions">
-      <a href={`mailto:${email}`} class="btn-nb btn-nb--paper btn-nb--lift">
-        {email}
+      <a href={`mailto:${site.email}`} class="btn-nb btn-nb--paper btn-nb--lift">
+        {site.email}
       </a>
-      <a href="https://www.github.com/HappyNaCl" class="btn-nb btn-nb--outline-paper">GitHub</a>
-      <a href="https://www.linkedin.com/in/yudhistira-yudhistira-bb6003412/" class="btn-nb btn-nb--outline-paper">LinkedIn</a>
+      <a href={site.github} class="btn-nb btn-nb--outline-paper">GitHub</a>
+      <a href={site.linkedin} class="btn-nb btn-nb--outline-paper">LinkedIn</a>
     </div>
   </div>
 

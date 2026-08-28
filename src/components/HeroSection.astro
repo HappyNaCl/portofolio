@@ -1,22 +1,25 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
 
 const roles = [
   {
     lines: ['DevOps', 'engineer'],
     intro:
-      'I build and run the boring parts well: deploy pipelines, observability, and the interfaces on top of them. One to two years in, mostly on small teams where the person who ships the feature also owns the alerting.',
+      'I keep Kubernetes clusters, app deployments, and network infrastructure \
+       running. Certified to teach Docker and Kubernetes before this, which is \
+       how I learned them properly instead of memorizing commands.',
   },
   {
     lines: ['Full-stack', 'developer'],
     intro:
-      'I ship the whole path: the schema, the API over it, and the interface people actually use. One to two years in, on the same small teams, where whoever designs the table is also the one explaining its query plan a month later.',
+      'I build the internal tools our network administrators use day to day: \
+       the schema, the API over it, and the interface people actually touch. \
+       I own it end to end, which means I also get to hear exactly what is broken about it.',
   },
 ];
 
 const [firstRole] = roles;
-
-const email = 'yuyudhistira0@gmail.com';
 ---
 
 <section id="top" class="section hero">
@@ -37,6 +40,20 @@ const email = 'yuyudhistira0@gmail.com';
     </span>
   </h1>
 
+  <button type="button" class="role-toggle" data-role-toggle>
+    <Icon
+      name="ph:pause-bold"
+      class="role-toggle-icon role-toggle-icon--pause"
+      aria-hidden="true"
+    />
+    <Icon
+      name="ph:play-bold"
+      class="role-toggle-icon role-toggle-icon--play"
+      aria-hidden="true"
+    />
+    <span data-role-toggle-label>Pause</span>
+  </button>
+
   <div class="intro" data-reveal>
     {
       roles.map((role, i) => (
@@ -52,11 +69,11 @@ const email = 'yuyudhistira0@gmail.com';
 
   <div class="actions" data-reveal>
     <a href="#cv" class="btn-nb btn-nb--ink btn-nb--lift">
-      <Icon name="ph:file-arrow-down-bold" aria-hidden="true" />
-      Download CV
+      <Icon name="ph:arrow-down-bold" aria-hidden="true" />
+      View résumé
     </a>
     <a
-      href="https://www.github.com/HappyNaCl"
+      href={site.github}
       class="btn-nb btn-nb--tint btn-nb--icon"
       aria-label="GitHub"
       title="GitHub"
@@ -64,7 +81,7 @@ const email = 'yuyudhistira0@gmail.com';
       <Icon name="ph:github-logo-bold" aria-hidden="true" />
     </a>
     <a
-      href="https://www.linkedin.com/in/yudhistira-yudhistira-bb6003412/"
+      href={site.linkedin}
       class="btn-nb btn-nb--tint btn-nb--icon"
       aria-label="LinkedIn"
       title="LinkedIn"
@@ -72,10 +89,10 @@ const email = 'yuyudhistira0@gmail.com';
       <Icon name="ph:linkedin-logo-bold" aria-hidden="true" />
     </a>
     <a
-      href={`mailto:${email}`}
+      href={`mailto:${site.email}`}
       class="btn-nb btn-nb--tint btn-nb--icon"
-      aria-label={`Email ${email}`}
-      title={email}
+      aria-label={`Email ${site.email}`}
+      title={site.email}
     >
       <Icon name="ph:envelope-simple-bold" aria-hidden="true" />
     </a>
@@ -150,7 +167,6 @@ const email = 'yuyudhistira0@gmail.com';
     grid-area: 1 / 1;
     margin: 0;
     text-wrap: pretty;
-    text-align: justify;
     opacity: 0;
     visibility: hidden;
     transition:
@@ -164,6 +180,54 @@ const email = 'yuyudhistira0@gmail.com';
     transition:
       opacity 0.34s ease,
       visibility 0s;
+  }
+
+  /* Revealed by script: without JS the headline never rotates, so a pause
+     control would do nothing. */
+  .role-toggle {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    margin-top: 16px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: transparent;
+    border: 2px solid var(--ink-3);
+    border-radius: 999px;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .role-toggle.is-live {
+    display: inline-flex;
+  }
+
+  .role-toggle:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: var(--cyan-tint);
+  }
+
+  .role-toggle-icon {
+    width: 11px;
+    height: 11px;
+    flex: none;
+  }
+
+  .role-toggle-icon--play,
+  .role-toggle.is-paused .role-toggle-icon--pause {
+    display: none;
+  }
+
+  .role-toggle.is-paused .role-toggle-icon--play {
+    display: block;
   }
 
   .actions {
@@ -183,6 +247,10 @@ const email = 'yuyudhistira0@gmail.com';
 <script>
   const word = document.querySelector<HTMLElement>('[data-role-word]');
   const text = word?.querySelector<HTMLElement>('[data-role-text]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-role-toggle]');
+  const toggleLabel = toggle?.querySelector<HTMLElement>(
+    '[data-role-toggle-label]'
+  );
   const intros = Array.from(
     document.querySelectorAll<HTMLElement>('[data-role-intro]')
   );
@@ -201,6 +269,7 @@ const email = 'yuyudhistira0@gmail.com';
       const FADE_MS = 340;
       const HOLD_MS = 8000;
       let index = 0;
+      let timer = 0;
 
       const paint = (lines: string[]) => {
         text.replaceChildren(
@@ -210,9 +279,7 @@ const email = 'yuyudhistira0@gmail.com';
         );
       };
 
-      setInterval(() => {
-        if (document.hidden) return;
-
+      const advance = () => {
         word.classList.add('is-out');
         intros[index]?.classList.remove('is-current');
 
@@ -222,7 +289,41 @@ const email = 'yuyudhistira0@gmail.com';
           word.classList.remove('is-out');
           intros[index]?.classList.add('is-current');
         }, FADE_MS);
-      }, HOLD_MS);
+      };
+
+      const queue = () => {
+        timer = window.setTimeout(() => {
+          if (!document.hidden) advance();
+          queue();
+        }, HOLD_MS);
+      };
+
+      const start = () => {
+        if (!timer) queue();
+      };
+
+      const stop = () => {
+        window.clearTimeout(timer);
+        timer = 0;
+      };
+
+      start();
+
+      // WCAG 2.2.2: content that updates itself for longer than five seconds
+      // needs a way to stop it.
+      if (toggle && toggleLabel) {
+        toggle.classList.add('is-live');
+
+        toggle.addEventListener('click', () => {
+          const wasRunning = Boolean(timer);
+          if (wasRunning) stop();
+          else start();
+
+          // The label carries the state, so no aria-pressed on top of it.
+          toggle.classList.toggle('is-paused', wasRunning);
+          toggleLabel.textContent = wasRunning ? 'Play' : 'Pause';
+        });
+      }
     }
   }
 </script>

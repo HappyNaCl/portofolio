@@ -6,7 +6,7 @@ const nav = [
 ];
 ---
 
-<header class="header">
+<header class="header" data-site-header>
   <div class="brand">Yudhistira<span class="dot">.</span></div>
 
   <nav class="nav-links" aria-label="Primary">
@@ -80,3 +80,22 @@ const nav = [
     }
   }
 </style>
+
+<script>
+  // The header is sticky and wraps to a second row under 520px, so its height
+  // is not a constant. Feed the real value to scroll-padding-top, otherwise
+  // anchored sections land underneath it.
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+
+  if (header) {
+    const publish = () => {
+      document.documentElement.style.setProperty(
+        '--header-h',
+        `${header.offsetHeight}px`
+      );
+    };
+
+    publish();
+    new ResizeObserver(publish).observe(header);
+  }
+</script>

@@ -5,7 +5,7 @@ year: "2025"
 role: Lead — 5-person team
 shot: event feed + campus filters
 repo: https://github.com/HappyNaCl/cavent
-cover: ./cavent-cover.png
+cover: ./cavent-cover.webp
 coverAlt: Event Search page
 stack:
   - Go

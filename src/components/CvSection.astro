@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { cvHref } from '../data/site';
 
 const entries = (await getCollection('timeline')).sort(
   (a, b) => a.data.order - b.data.order
@@ -16,13 +17,29 @@ const rows = await Promise.all(
 <section id="cv" class="section cv">
   <div class="section-head" data-reveal>
     <h2>Résumé</h2>
-    <a href="#cv" class="btn-nb btn-nb--tint download">Download PDF ↓</a>
+
+    <div class="downloads">
+      <a
+        href={cvHref('devops')}
+        class="btn-nb btn-nb--tint download"
+        aria-label="DevOps CV, PDF résumé"
+      >
+        DevOps CV <span aria-hidden="true">↓</span>
+      </a>
+      <a
+        href={cvHref('fullStack')}
+        class="btn-nb btn-nb--tint download"
+        aria-label="Full-stack CV, PDF résumé"
+      >
+        Full-stack CV <span aria-hidden="true">↓</span>
+      </a>
+    </div>
   </div>
 
   <ol class="timeline">
     {
       rows.map(({ Content, ...row }) => (
-        <li class="row">
+        <li class="row" data-reveal>
           <div class="marker" aria-hidden="true">
             <span class="line" />
             <span class="node" />
@@ -45,7 +62,7 @@ const rows = await Promise.all(
     <div class="terminus-marker" aria-hidden="true">
       <span class="terminus-node" />
     </div>
-    <div class="mono terminus-label">Start of the line — 2020</div>
+    <div class="mono terminus-label">Start of the line — 2023</div>
   </div>
 </section>
 
@@ -54,11 +71,19 @@ const rows = await Promise.all(
     padding-top: 96px;
   }
 
+  /* Grouped so the pair wraps together rather than splitting across the
+     section-head's much wider gap. */
+  .downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
   .download {
     --nb-size: 5px;
     font-size: 14px;
     padding: 10px 18px;
-    margin-bottom: 6px;
   }
 
   .timeline {

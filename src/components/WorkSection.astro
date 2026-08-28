@@ -34,6 +34,18 @@ const projects = await Promise.all(
           })
         ).src
       : null,
+    // Handed to the lightbox so the dialog reserves the right box before the
+    // image decodes, instead of reflowing once it lands.
+    fullWidth: entry.data.cover
+      ? Math.min(FULL_WIDTH, entry.data.cover.width)
+      : null,
+    fullHeight: entry.data.cover
+      ? Math.round(
+          (entry.data.cover.height *
+            Math.min(FULL_WIDTH, entry.data.cover.width)) /
+            entry.data.cover.width
+        )
+      : null,
     Content: (await render(entry)).Content,
   }))
 );
@@ -59,6 +71,8 @@ const count = String(projects.length).padStart(2, '0');
                   class="shot shot-btn"
                   data-lightbox
                   data-full={project.full}
+                  data-full-w={project.fullWidth}
+                  data-full-h={project.fullHeight}
                   data-alt={project.coverAlt!}
                   aria-label={`Open the ${project.title} cover full size`}
                 >
@@ -340,6 +354,13 @@ const count = String(projects.length).padStart(2, '0');
       '[data-lightbox]'
     )) {
       trigger.addEventListener('click', () => {
+        const width = Number(trigger.dataset.fullW);
+        const height = Number(trigger.dataset.fullH);
+        if (width && height) {
+          image.width = width;
+          image.height = height;
+        }
+
         image.src = trigger.dataset.full ?? '';
         image.alt = trigger.dataset.alt ?? '';
         lock();

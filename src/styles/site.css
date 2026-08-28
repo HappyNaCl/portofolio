@@ -15,10 +15,6 @@
   --magenta-tint: var(--color-accent-2-200);
   --magenta-deep: var(--color-accent-2-700);
 
-  --cta: var(--color-text);
-  --cta-hover: var(--color-accent-600);
-  --cta-text: var(--color-bg);
-
   --gutter: clamp(20px, 5vw, 72px);
   --measure: 1240px;
 }
@@ -39,16 +35,16 @@
   --magenta: var(--color-accent-2-400);
   --magenta-tint: var(--color-accent-2-800);
   --magenta-deep: var(--color-accent-2-300);
-
-  --cta: var(--color-accent-800);
-  --cta-hover: var(--color-accent-600);
-  --cta-text: var(--color-bg);
 }
 
 html {
   scroll-behavior: smooth;
 
-  scroll-padding-top: 78px;
+  /* Measured off the real header by SiteHeader.astro -- it wraps to a second
+     row on narrow screens, so a fixed value drops anchor targets underneath it.
+     The literal here is only the pre-hydration fallback. */
+  --header-h: 70px;
+  scroll-padding-top: calc(var(--header-h) + 14px);
 }
 
 body {
@@ -72,6 +68,39 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 40;
+  padding: 12px 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--cyan-tint);
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+
+  /* Off-canvas rather than display:none so it stays in the tab order. */
+  transform: translateY(calc(-100% - 20px));
+  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* :focus, not :focus-visible -- the link is off-canvas until focused, so the
+   only way to reach it is the keyboard, and some assistive tech moves focus
+   without setting the focus-visible heuristic. */
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* The landmark takes focus from the skip link; it is not an interactive
+   control, so it should not draw a ring of its own. */
+main:focus {
+  outline: none;
 }
 
 .mono {
@@ -221,7 +250,6 @@ a:hover {
   background: var(--paper);
   border: 2px solid var(--ink);
   padding: 4px 8px;
-  text-align: justify;
 }
 
 [data-reveal] {
@@ -230,7 +258,11 @@ a:hover {
     transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-[data-reveal].is-hidden {
+/* Hidden from the very first paint. A deferred module cannot add a class
+   before the browser paints, so hiding from script let content appear, vanish,
+   then fade back in on a slow connection. Gated on .js so that without
+   scripting -- where nothing would ever reveal these -- they stay visible. */
+html.js [data-reveal]:not(.is-shown) {
   opacity: 0;
   transform: translateY(22px);
 }
@@ -248,7 +280,9 @@ a:hover {
     transition-duration: 0.01ms !important;
   }
 
-  [data-reveal].is-hidden {
+  /* The script leaves these alone under reduced motion, so the stylesheet has
+     to be what un-hides them. */
+  html.js [data-reveal]:not(.is-shown) {
     opacity: 1;
     transform: none;
   }

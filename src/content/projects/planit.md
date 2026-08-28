@@ -5,8 +5,8 @@ year: "2026"
 role: Solo — technical test, reworked
 shot: attraction browse + admin dashboard
 repo: https://github.com/HappyNaCl/PlanIt
-cover: ./planit-cover.png
-coverAlt: Schedule + Attraciton page
+cover: ./planit-cover.webp
+coverAlt: Schedule + Attraction page
 stack:
   - .NET
   - PostgreSQL

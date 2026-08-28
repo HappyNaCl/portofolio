@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+---
+
+<BaseLayout
+  title="Page not found - Yudhistira"
+  description="That page does not exist. Head back to the portfolio."
+>
+  <SiteHeader />
+  <ThemeToggle />
+
+  <main id="main" tabindex="-1" class="section notfound">
+    <div class="code mono">Error 404</div>
+    <h1 class="headline">Nothing here<span class="accent">.</span></h1>
+    <p class="blurb">
+      That page does not exist — most likely a stale link, or a typo in the
+      address. Everything lives on one page anyway.
+    </p>
+
+    <div class="actions">
+      <a href="/" class="btn-nb btn-nb--ink btn-nb--lift">Back to the start</a>
+      <a href="/#work" class="btn-nb btn-nb--tint btn-nb--lift">Selected work</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding-top: clamp(60px, 12vh, 140px);
+    padding-bottom: 90px;
+  }
+
+  .code {
+    color: var(--cyan-deep);
+  }
+
+  .headline {
+    font-size: clamp(44px, 8.5vw, 110px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+    margin: 18px 0 0;
+    max-width: 15ch;
+  }
+
+  .accent {
+    color: var(--magenta);
+  }
+
+  .blurb {
+    font-size: clamp(18px, 2.1vw, 22px);
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 52ch;
+    margin: 24px 0 0;
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 38px;
+  }
+</style>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Résumés carry personal contact details; keep them reachable from the site
+# but out of search results.
+Disallow: /cv/
+
+Sitemap: https://yuyudhistira.my.id/sitemap-index.xml
