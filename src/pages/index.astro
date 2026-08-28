@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import SectionRail from '../components/SectionRail.astro';
+import HeroSection from '../components/HeroSection.astro';
+import WorkSection from '../components/WorkSection.astro';
+import AboutSection from '../components/AboutSection.astro';
+import CvSection from '../components/CvSection.astro';
+import ContactSection from '../components/ContactSection.astro';
+import ScrollReveal from '../components/ScrollReveal.astro';
+---
+
+<BaseLayout
+  title="Yudhistira - DevOps engineer & full-stack developer"
+  description="DevOps engineer and full-stack developer. Deploy pipelines, observability, and the interfaces on top of them. Open to work, remote or Jakarta."
+>
+  <SiteHeader />
+  <ThemeToggle />
+  <SectionRail />
+
+  <main>
+    <HeroSection />
+    <WorkSection />
+    <AboutSection />
+    <CvSection />
+    <ContactSection />
+  </main>
+
+  <ScrollReveal />
+</BaseLayout>

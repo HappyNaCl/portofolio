@@ -1,0 +1,164 @@
+---
+const sections = [
+  { id: 'top', href: '#top', label: 'Intro' },
+  { id: 'work', href: '#work', label: 'Work' },
+  { id: 'about', href: '#about', label: 'About' },
+  { id: 'cv', href: '#cv', label: 'Résumé' },
+  { id: 'contact', href: '#contact', label: 'Contact' },
+];
+---
+
+<nav class="rail" aria-label="Section navigation">
+  {
+    sections.map(({ id, href, label }) => (
+      <a href={href} class="rail-pill" data-rail-pill={id} aria-label={label}>
+        <span class="rail-label">{label}</span>
+        <span class="rail-dot" aria-hidden="true" />
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .rail {
+    position: fixed;
+    top: 50%;
+    right: clamp(16px, 2.4vw, 34px);
+    transform: translateY(-50%);
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .rail-pill {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0;
+    overflow: hidden;
+    height: 20px;
+    width: 30px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 0 8px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transition:
+      width 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+      gap 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+      box-shadow 0.15s ease,
+      transform 0.15s ease,
+      background 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .rail:hover .rail-pill,
+  .rail:focus-within .rail-pill {
+    width: 104px;
+    gap: 8px;
+  }
+
+  .rail-pill:hover {
+    background: var(--cyan-tint);
+    color: var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    transform: translate(1px, 1px);
+  }
+
+  .rail-pill:active {
+    box-shadow: 0 0 0 var(--ink);
+    transform: translate(3px, 3px);
+  }
+
+  .rail-pill.is-active {
+    background: var(--cyan);
+    color: var(--paper);
+    box-shadow: 4px 4px 0 var(--magenta);
+  }
+
+  .rail-pill.is-active:hover {
+    box-shadow: 2px 2px 0 var(--magenta);
+  }
+
+  .rail-pill.is-active .rail-dot {
+    background: var(--paper);
+  }
+
+  .rail-label {
+    flex: 1 1 auto;
+    opacity: 0;
+    transition: opacity 0.18s ease 0.04s;
+  }
+
+  .rail:hover .rail-label,
+  .rail:focus-within .rail-label {
+    opacity: 1;
+  }
+
+  .rail-dot {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-3);
+  }
+
+  @media (max-width: 720px) {
+    .rail {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const pills = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('[data-rail-pill]')
+  );
+
+  if (pills.length) {
+    const sections = pills
+      .map((pill) => ({
+        pill,
+        el: document.getElementById(pill.dataset.railPill ?? ''),
+      }))
+      .filter((entry): entry is { pill: HTMLAnchorElement; el: HTMLElement } =>
+        Boolean(entry.el)
+      );
+
+    const mark = () => {
+      const line = window.innerHeight * 0.34;
+      let active = sections[0];
+
+      for (const entry of sections) {
+        if (entry.el.getBoundingClientRect().top <= line) active = entry;
+      }
+
+      for (const entry of sections) {
+        entry.pill.classList.toggle('is-active', entry === active);
+        if (entry === active) entry.pill.setAttribute('aria-current', 'true');
+        else entry.pill.removeAttribute('aria-current');
+      }
+    };
+
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        mark();
+      });
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    mark();
+  }
+</script>

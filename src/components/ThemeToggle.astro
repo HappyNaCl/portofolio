@@ -1,0 +1,90 @@
+---
+import { Icon } from 'astro-icon/components';
+
+---
+
+<button
+  type="button"
+  class="toggle"
+  data-theme-toggle
+  aria-label="Toggle dark mode"
+  aria-pressed="false"
+  title="Switch to dark mode"
+>
+  <Icon name="ph:sun-duotone" class="icon icon-sun" size={26} aria-hidden="true" />
+  <Icon name="ph:moon-duotone" class="icon icon-moon" size={26} aria-hidden="true" />
+</button>
+
+<style>
+  .toggle {
+    position: fixed;
+    bottom: clamp(16px, 2.6vw, 34px);
+    right: clamp(16px, 2.4vw, 34px);
+    z-index: 26;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    cursor: pointer;
+    border: 3px solid var(--ink);
+    border-radius: 0;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  }
+
+  .toggle:hover {
+    background: var(--cyan-tint);
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: translate(2px, 2px);
+  }
+
+  .toggle:active {
+    box-shadow: 0 0 0 var(--ink);
+    transform: translate(5px, 5px);
+  }
+
+  .icon {
+    display: block;
+  }
+
+  .icon-moon {
+    display: none;
+  }
+
+  :global(html[data-theme='dark']) .icon-sun {
+    display: none;
+  }
+
+  :global(html[data-theme='dark']) .icon-moon {
+    display: block;
+  }
+</style>
+
+<script>
+  const KEY = 'yd-theme';
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+
+  function sync(dark: boolean) {
+    if (dark) root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+
+    if (!button) return;
+    button.setAttribute('aria-pressed', String(dark));
+    button.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+  }
+
+  sync(root.getAttribute('data-theme') === 'dark');
+
+  button?.addEventListener('click', () => {
+    const dark = root.getAttribute('data-theme') !== 'dark';
+    sync(dark);
+    try {
+      localStorage.setItem(KEY, dark ? 'dark' : 'light');
+    } catch {}
+  });
+</script>

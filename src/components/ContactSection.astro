@@ -1,0 +1,77 @@
+---
+const email = 'yuyudhistira0@gmail.com';
+---
+
+<section id="contact" class="section contact">
+  <div class="panel" data-reveal>
+    <h2 class="heading">Got something that needs to stay up?</h2>
+    <p class="blurb">
+      Contract, full-time, or a one-off pipeline rescue. I reply within a day.
+    </p>
+
+    <div class="actions">
+      <a href={`mailto:${email}`} class="btn-nb btn-nb--paper btn-nb--lift">
+        {email}
+      </a>
+      <a href="https://www.github.com/HappyNaCl" class="btn-nb btn-nb--outline-paper">GitHub</a>
+      <a href="https://www.linkedin.com/in/yudhistira-yudhistira-bb6003412/" class="btn-nb btn-nb--outline-paper">LinkedIn</a>
+    </div>
+  </div>
+
+  <footer class="footer mono">
+    <span class="copyright">© 2026 Yudhistira</span>
+  </footer>
+</section>
+
+<style>
+  .contact {
+    padding-top: 96px;
+    padding-bottom: 80px;
+  }
+
+  .panel {
+    border: 3px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 10px 10px 0 var(--cyan);
+    padding: clamp(30px, 5vw, 60px);
+  }
+
+  .heading {
+    font-size: clamp(32px, 5.4vw, 68px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    margin: 0;
+    max-width: 20ch;
+  }
+
+  .blurb {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--stripe);
+    margin: 20px 0 0;
+    max-width: 50ch;
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 34px;
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-top: 34px;
+    color: var(--ink-3);
+  }
+
+  .copyright {
+    margin-right: auto;
+  }
+</style>

@@ -1,0 +1,159 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const entries = (await getCollection('timeline')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const rows = await Promise.all(
+  entries.map(async (entry) => ({
+    ...entry.data,
+    Content: (await render(entry)).Content,
+  }))
+);
+---
+
+<section id="cv" class="section cv">
+  <div class="section-head" data-reveal>
+    <h2>Résumé</h2>
+    <a href="#cv" class="btn-nb btn-nb--tint download">Download PDF ↓</a>
+  </div>
+
+  <ol class="timeline">
+    {
+      rows.map(({ Content, ...row }) => (
+        <li class="row">
+          <div class="marker" aria-hidden="true">
+            <span class="line" />
+            <span class="node" />
+          </div>
+
+          <div>
+            <div class="when mono">{row.when}</div>
+            <h3 class="role">{row.role}</h3>
+            <div class="org">{row.org}</div>
+            <div class="blurb">
+              <Content />
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="terminus">
+    <div class="terminus-marker" aria-hidden="true">
+      <span class="terminus-node" />
+    </div>
+    <div class="mono terminus-label">Start of the line — 2020</div>
+  </div>
+</section>
+
+<style>
+  .cv {
+    padding-top: 96px;
+  }
+
+  .download {
+    --nb-size: 5px;
+    font-size: 14px;
+    padding: 10px 18px;
+    margin-bottom: 6px;
+  }
+
+  .timeline {
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    column-gap: 26px;
+    padding-bottom: 42px;
+  }
+
+  .marker {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .line {
+    position: absolute;
+    top: 18px;
+    bottom: -42px;
+    width: 3px;
+    background: var(--ink);
+  }
+
+  .node {
+    position: relative;
+    z-index: 1;
+    width: 19px;
+    height: 19px;
+    margin-top: 5px;
+    border-radius: 50%;
+    border: 3px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .when {
+    font-size: 12px;
+    color: var(--cyan-deep);
+  }
+
+  .role {
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 8px 0 0;
+  }
+
+  .org {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 4px;
+  }
+
+  .blurb {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    margin: 12px 0 0;
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+
+  .blurb :global(p) {
+    margin: 0;
+  }
+
+  .blurb :global(p + p) {
+    margin-top: 0.8em;
+  }
+
+  .terminus {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    column-gap: 26px;
+    align-items: center;
+  }
+
+  .terminus-marker {
+    display: flex;
+    justify-content: center;
+  }
+
+  .terminus-node {
+    width: 11px;
+    height: 11px;
+    background: var(--ink);
+  }
+
+  .terminus-label {
+    color: var(--ink-3);
+  }
+</style>

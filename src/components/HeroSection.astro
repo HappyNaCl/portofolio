@@ -1,0 +1,228 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const roles = [
+  {
+    lines: ['DevOps', 'engineer'],
+    intro:
+      'I build and run the boring parts well: deploy pipelines, observability, and the interfaces on top of them. One to two years in, mostly on small teams where the person who ships the feature also owns the alerting.',
+  },
+  {
+    lines: ['Full-stack', 'developer'],
+    intro:
+      'I ship the whole path: the schema, the API over it, and the interface people actually use. One to two years in, on the same small teams, where whoever designs the table is also the one explaining its query plan a month later.',
+  },
+];
+
+const [firstRole] = roles;
+
+const email = 'yuyudhistira0@gmail.com';
+---
+
+<section id="top" class="section hero">
+  <div class="badge" data-reveal>
+    <span class="badge-dot" aria-hidden="true"></span>
+    Open to work — remote / Jakarta
+  </div>
+
+  <h1 class="headline">
+    <span
+      class="role"
+      data-role-word
+      data-roles={JSON.stringify(roles.map((role) => role.lines))}
+    >
+      <span data-role-text set:html={firstRole.lines.join('<br>')}></span><span
+        class="accent">.</span
+      >
+    </span>
+  </h1>
+
+  <div class="intro" data-reveal>
+    {
+      roles.map((role, i) => (
+        <p
+          class:list={['intro-copy', { 'is-current': i === 0 }]}
+          data-role-intro
+        >
+          {role.intro}
+        </p>
+      ))
+    }
+  </div>
+
+  <div class="actions" data-reveal>
+    <a href="#cv" class="btn-nb btn-nb--ink btn-nb--lift">
+      <Icon name="ph:file-arrow-down-bold" aria-hidden="true" />
+      Download CV
+    </a>
+    <a
+      href="https://www.github.com/HappyNaCl"
+      class="btn-nb btn-nb--tint btn-nb--icon"
+      aria-label="GitHub"
+      title="GitHub"
+    >
+      <Icon name="ph:github-logo-bold" aria-hidden="true" />
+    </a>
+    <a
+      href="https://www.linkedin.com/in/yudhistira-yudhistira-bb6003412/"
+      class="btn-nb btn-nb--tint btn-nb--icon"
+      aria-label="LinkedIn"
+      title="LinkedIn"
+    >
+      <Icon name="ph:linkedin-logo-bold" aria-hidden="true" />
+    </a>
+    <a
+      href={`mailto:${email}`}
+      class="btn-nb btn-nb--tint btn-nb--icon"
+      aria-label={`Email ${email}`}
+      title={email}
+    >
+      <Icon name="ph:envelope-simple-bold" aria-hidden="true" />
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(48px, 8vw, 110px);
+    padding-bottom: 70px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 3px solid var(--ink);
+    background: var(--magenta-tint);
+    padding: 6px 14px;
+    box-shadow: 5px 5px 0 var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .badge-dot {
+    width: 9px;
+    height: 9px;
+    background: var(--magenta);
+    border-radius: 50%;
+  }
+
+  .headline {
+    font-size: clamp(44px, 8.5vw, 110px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+    margin: 28px 0 0;
+    max-width: 15ch;
+    min-height: 1.9em;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .role {
+    display: inline-block;
+    transition:
+      opacity 0.34s ease,
+      transform 0.34s ease;
+  }
+
+  .role.is-out {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .accent {
+    color: var(--cyan);
+  }
+
+  .intro {
+    display: grid;
+    font-size: clamp(18px, 2.1vw, 24px);
+    line-height: 1.5;
+    max-width: 58ch;
+    margin: 24px 0 0;
+    color: var(--ink-2);
+  }
+
+  .intro-copy {
+    grid-area: 1 / 1;
+    margin: 0;
+    text-wrap: pretty;
+    text-align: justify;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.34s ease,
+      visibility 0s linear 0.34s;
+  }
+
+  .intro-copy.is-current {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.34s ease,
+      visibility 0s;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 459px) {
+    .actions > :first-child {
+      flex: 1 1 100%;
+    }
+  }
+</style>
+
+<script>
+  const word = document.querySelector<HTMLElement>('[data-role-word]');
+  const text = word?.querySelector<HTMLElement>('[data-role-text]');
+  const intros = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-role-intro]')
+  );
+
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (word && text && !reducedMotion) {
+    let roles: string[][] = [];
+    try {
+      roles = JSON.parse(word.dataset.roles ?? '[]');
+    } catch {
+      roles = [];
+    }
+
+    if (roles.length > 1) {
+      const FADE_MS = 340;
+      const HOLD_MS = 8000;
+      let index = 0;
+
+      const paint = (lines: string[]) => {
+        text.replaceChildren(
+          ...lines.flatMap<Node | string>((line, i) =>
+            i === 0 ? [line] : [document.createElement('br'), line]
+          )
+        );
+      };
+
+      setInterval(() => {
+        if (document.hidden) return;
+
+        word.classList.add('is-out');
+        intros[index]?.classList.remove('is-current');
+
+        setTimeout(() => {
+          index = (index + 1) % roles.length;
+          paint(roles[index]);
+          word.classList.remove('is-out');
+          intros[index]?.classList.add('is-current');
+        }, FADE_MS);
+      }, HOLD_MS);
+    }
+  }
+</script>
