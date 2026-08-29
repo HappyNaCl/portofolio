@@ -1,6 +1,6 @@
 ---
 order: 3
-when: 2024 — 2025
+when: September 2024 — January 2026
 role: Laboratory Assistant
 org: BINUS University
 ---

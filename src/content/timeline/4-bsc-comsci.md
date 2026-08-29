@@ -1,6 +1,6 @@
 ---
 order: 4
-when: 2023 — Present
+when: July 2023 — Present
 role: B.Sc. in Computer Science
 org: BINUS University
 ---

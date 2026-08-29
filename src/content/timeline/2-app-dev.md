@@ -1,6 +1,6 @@
 ---
 order: 2
-when: 2026 — Present
+when: February 2026 — Present
 role: AI Application Developer Apprenticeship
 org: BINUS University (IT Division)
 ---
