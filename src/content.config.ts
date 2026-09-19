@@ -7,6 +7,8 @@ const projects = defineCollection({
     z
       .object({
         order: z.number().int().positive(),
+        /** Which tab of the work section the project is listed under. */
+        category: z.enum(['personal', 'professional']).default('personal'),
         title: z.string(),
         year: z.string(),
         role: z.string(),

@@ -2,8 +2,13 @@
 import { Icon } from 'astro-icon/components';
 import { site } from '../data/site';
 
-const roles = [
+// The ids are matched by the show/hide selectors in the stylesheet below; keep
+// the two in step if a track is added or renamed.
+const tracks = [
   {
+    id: 'devops',
+    label: 'DevOps',
+    icon: 'ph:hard-drives-bold',
     lines: ['DevOps', 'engineer'],
     intro:
       'I keep Kubernetes clusters, app deployments, and network infrastructure \
@@ -11,6 +16,9 @@ const roles = [
        how I learned them properly instead of memorizing commands.',
   },
   {
+    id: 'fullstack',
+    label: 'Full-stack',
+    icon: 'ph:code-bold',
     lines: ['Full-stack', 'developer'],
     intro:
       'I build the internal tools our network administrators use day to day: \
@@ -18,50 +26,48 @@ const roles = [
        I own it end to end, which means I also get to hear exactly what is broken about it.',
   },
 ];
-
-const [firstRole] = roles;
 ---
 
 <section id="top" class="section hero">
-  <div class="badge" data-reveal>
-    <span class="badge-dot" aria-hidden="true"></span>
-    Open to work — remote / Jakarta
-  </div>
+  <!-- Plain radios, styled as a segmented control. The swap below is pure CSS
+       (:has), so it works without JavaScript and keeps native arrow-key
+       behaviour for free. -->
+  <fieldset class="switch" data-reveal>
+    <legend class="visually-hidden">Show my work as</legend>
+    {
+      tracks.map((track, i) => (
+        <label class="switch-option">
+          <input
+            type="radio"
+            name="track"
+            value={track.id}
+            checked={i === 0}
+            class="visually-hidden"
+          />
+          <Icon name={track.icon} aria-hidden="true" />
+          {track.label}
+        </label>
+      ))
+    }
+  </fieldset>
 
   <h1 class="headline">
-    <span
-      class="role"
-      data-role-word
-      data-roles={JSON.stringify(roles.map((role) => role.lines))}
-    >
-      <span data-role-text set:html={firstRole.lines.join('<br>')}></span><span
-        class="accent">.</span
-      >
-    </span>
+    {
+      tracks.map((track) => (
+        <span class="role" data-track={track.id}>
+          <Fragment set:html={track.lines.join('<br>')} /><span class="accent"
+            >.</span
+          >
+        </span>
+      ))
+    }
   </h1>
-
-  <button type="button" class="role-toggle" data-role-toggle>
-    <Icon
-      name="ph:pause-bold"
-      class="role-toggle-icon role-toggle-icon--pause"
-      aria-hidden="true"
-    />
-    <Icon
-      name="ph:play-bold"
-      class="role-toggle-icon role-toggle-icon--play"
-      aria-hidden="true"
-    />
-    <span data-role-toggle-label>Pause</span>
-  </button>
 
   <div class="intro" data-reveal>
     {
-      roles.map((role, i) => (
-        <p
-          class:list={['intro-copy', { 'is-current': i === 0 }]}
-          data-role-intro
-        >
-          {role.intro}
+      tracks.map((track) => (
+        <p class="intro-copy" data-track={track.id}>
+          I'm <strong class="intro-name">Yudhistira</strong>. {track.intro}
         </p>
       ))
     }
@@ -101,53 +107,18 @@ const [firstRole] = roles;
 
 <style>
   .hero {
-    padding-top: clamp(48px, 8vw, 110px);
+    padding-top: clamp(40px, 6vw, 84px);
     padding-bottom: 70px;
   }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    border: 3px solid var(--ink);
-    background: var(--magenta-tint);
-    padding: 6px 14px;
-    box-shadow: 5px 5px 0 var(--ink);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .badge-dot {
-    width: 9px;
-    height: 9px;
-    background: var(--magenta);
-    border-radius: 50%;
-  }
-
   .headline {
+    display: grid;
     font-size: clamp(44px, 8.5vw, 110px);
     line-height: 0.95;
     letter-spacing: -0.035em;
     font-weight: 700;
     margin: 28px 0 0;
     max-width: 15ch;
-    min-height: 1.9em;
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .role {
-    display: inline-block;
-    transition:
-      opacity 0.34s ease,
-      transform 0.34s ease;
-  }
-
-  .role.is-out {
-    opacity: 0;
-    transform: translateY(16px);
   }
 
   .accent {
@@ -164,70 +135,47 @@ const [firstRole] = roles;
   }
 
   .intro-copy {
-    grid-area: 1 / 1;
     margin: 0;
     text-wrap: pretty;
+  }
+
+  .intro-name {
+    color: var(--ink);
+  }
+
+  /* Both tracks share one grid cell, so the block is sized by the taller of
+     them and nothing below jumps on switch. The outgoing copy fades first and
+     the incoming one waits for it, so the two never overlap mid-fade. */
+  .role,
+  .intro-copy {
+    grid-area: 1 / 1;
+    transition:
+      opacity 0.3s ease 0.18s,
+      transform 0.3s ease 0.18s,
+      visibility 0s linear 0.18s;
+  }
+
+  /* DevOps is the default, so a browser without :has still shows a full
+     headline rather than none. */
+  [data-track='fullstack'],
+  .hero:has(input[value='fullstack']:checked) [data-track='devops'] {
     opacity: 0;
     visibility: hidden;
+    transform: translateY(14px);
     transition:
-      opacity 0.34s ease,
-      visibility 0s linear 0.34s;
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0s linear 0.18s;
   }
 
-  .intro-copy.is-current {
+  .hero:has(input[value='fullstack']:checked) [data-track='fullstack'] {
     opacity: 1;
     visibility: visible;
+    transform: none;
     transition:
-      opacity 0.34s ease,
-      visibility 0s;
-  }
-
-  /* Revealed by script: without JS the headline never rotates, so a pause
-     control would do nothing. */
-  .role-toggle {
-    display: none;
-    align-items: center;
-    gap: 7px;
-    margin-top: 16px;
-    padding: 5px 12px;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    background: transparent;
-    border: 2px solid var(--ink-3);
-    border-radius: 999px;
-    transition:
-      color 0.15s ease,
-      border-color 0.15s ease,
-      background 0.15s ease;
-  }
-
-  .role-toggle.is-live {
-    display: inline-flex;
-  }
-
-  .role-toggle:hover {
-    color: var(--ink);
-    border-color: var(--ink);
-    background: var(--cyan-tint);
-  }
-
-  .role-toggle-icon {
-    width: 11px;
-    height: 11px;
-    flex: none;
-  }
-
-  .role-toggle-icon--play,
-  .role-toggle.is-paused .role-toggle-icon--pause {
-    display: none;
-  }
-
-  .role-toggle.is-paused .role-toggle-icon--play {
-    display: block;
+      opacity 0.3s ease 0.18s,
+      transform 0.3s ease 0.18s,
+      visibility 0s linear 0.18s;
   }
 
   .actions {
@@ -243,87 +191,3 @@ const [firstRole] = roles;
     }
   }
 </style>
-
-<script>
-  const word = document.querySelector<HTMLElement>('[data-role-word]');
-  const text = word?.querySelector<HTMLElement>('[data-role-text]');
-  const toggle = document.querySelector<HTMLButtonElement>('[data-role-toggle]');
-  const toggleLabel = toggle?.querySelector<HTMLElement>(
-    '[data-role-toggle-label]'
-  );
-  const intros = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-role-intro]')
-  );
-
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (word && text && !reducedMotion) {
-    let roles: string[][] = [];
-    try {
-      roles = JSON.parse(word.dataset.roles ?? '[]');
-    } catch {
-      roles = [];
-    }
-
-    if (roles.length > 1) {
-      const FADE_MS = 340;
-      const HOLD_MS = 8000;
-      let index = 0;
-      let timer = 0;
-
-      const paint = (lines: string[]) => {
-        text.replaceChildren(
-          ...lines.flatMap<Node | string>((line, i) =>
-            i === 0 ? [line] : [document.createElement('br'), line]
-          )
-        );
-      };
-
-      const advance = () => {
-        word.classList.add('is-out');
-        intros[index]?.classList.remove('is-current');
-
-        setTimeout(() => {
-          index = (index + 1) % roles.length;
-          paint(roles[index]);
-          word.classList.remove('is-out');
-          intros[index]?.classList.add('is-current');
-        }, FADE_MS);
-      };
-
-      const queue = () => {
-        timer = window.setTimeout(() => {
-          if (!document.hidden) advance();
-          queue();
-        }, HOLD_MS);
-      };
-
-      const start = () => {
-        if (!timer) queue();
-      };
-
-      const stop = () => {
-        window.clearTimeout(timer);
-        timer = 0;
-      };
-
-      start();
-
-      // WCAG 2.2.2: content that updates itself for longer than five seconds
-      // needs a way to stop it.
-      if (toggle && toggleLabel) {
-        toggle.classList.add('is-live');
-
-        toggle.addEventListener('click', () => {
-          const wasRunning = Boolean(timer);
-          if (wasRunning) stop();
-          else start();
-
-          // The label carries the state, so no aria-pressed on top of it.
-          toggle.classList.toggle('is-paused', wasRunning);
-          toggleLabel.textContent = wasRunning ? 'Play' : 'Pause';
-        });
-      }
-    }
-  }
-</script>

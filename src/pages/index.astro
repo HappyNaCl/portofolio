@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import SectionRail from '../components/SectionRail.astro';
 import HeroSection from '../components/HeroSection.astro';
@@ -15,14 +14,13 @@ import ScrollReveal from '../components/ScrollReveal.astro';
   title="Yudhistira - DevOps engineer & full-stack developer"
   description="DevOps engineer and full-stack developer. Deploy pipelines, observability, and the interfaces on top of them. Open to work, remote or Jakarta."
 >
-  <SiteHeader />
   <ThemeToggle />
   <SectionRail />
 
   <main id="main" tabindex="-1">
     <HeroSection />
-    <WorkSection />
     <AboutSection />
+    <WorkSection />
     <CvSection />
     <ContactSection />
   </main>

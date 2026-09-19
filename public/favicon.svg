@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#f3f2f2"/>
-  <rect x="2.5" y="2.5" width="27" height="27" fill="none" stroke="#201e1d" stroke-width="3"/>
-  <text x="15" y="23" font-family="Georgia, serif" font-size="19" font-weight="700" fill="#201e1d" text-anchor="middle">Y</text>
-  <circle cx="25" cy="22" r="2.5" fill="#d6006c"/>
+  <style>
+    .shadow { fill: #d6006c; }
+    .tile { fill: #201e1d; }
+    .mark { fill: #f3f2f2; }
+    .dot { fill: #62c5ee; }
+    @media (prefers-color-scheme: dark) {
+      .shadow { fill: #ff90b1; }
+      .tile { fill: #f3f2f2; }
+      .mark { fill: #201e1d; }
+      .dot { fill: #0088b0; }
+    }
+  </style>
+  <rect class="shadow" x="6" y="6" width="24" height="24"/>
+  <rect class="tile" x="2" y="2" width="24" height="24"/>
+  <polygon class="mark" points="6,6.5 10,6.5 13.5,11.5 17,6.5 21,6.5 15.5,14.5 15.5,21.5 11.5,21.5 11.5,14.5"/>
+  <rect class="dot" x="18.5" y="18.5" width="3" height="3"/>
 </svg>

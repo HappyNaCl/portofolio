@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 
+/** Per tab. */
 const MAX_PROJECTS = 4;
 const FULL_WIDTH = 1920;
 
@@ -22,114 +23,156 @@ for (const entry of entries) {
   seenOrder.set(entry.data.order, entry.id);
 }
 
-const projects = await Promise.all(
-  entries.slice(0, MAX_PROJECTS).map(async (entry) => ({
-    ...entry.data,
-    num: String(entry.data.order).padStart(2, '0'),
-    full: entry.data.cover
-      ? (
-          await getImage({
-            src: entry.data.cover,
-            width: Math.min(FULL_WIDTH, entry.data.cover.width),
-          })
-        ).src
-      : null,
-    // Handed to the lightbox so the dialog reserves the right box before the
-    // image decodes, instead of reflowing once it lands.
-    fullWidth: entry.data.cover
-      ? Math.min(FULL_WIDTH, entry.data.cover.width)
-      : null,
-    fullHeight: entry.data.cover
-      ? Math.round(
-          (entry.data.cover.height *
-            Math.min(FULL_WIDTH, entry.data.cover.width)) /
-            entry.data.cover.width
-        )
-      : null,
-    Content: (await render(entry)).Content,
-  }))
-);
+type Entry = (typeof entries)[number];
 
-const count = String(projects.length).padStart(2, '0');
+const toCard = async (entry: Entry, index: number) => ({
+  ...entry.data,
+  // Numbered within its tab, so each tab counts up from 01.
+  num: String(index + 1).padStart(2, '0'),
+  full: entry.data.cover
+    ? (
+        await getImage({
+          src: entry.data.cover,
+          width: Math.min(FULL_WIDTH, entry.data.cover.width),
+        })
+      ).src
+    : null,
+  // Handed to the lightbox so the dialog reserves the right box before the
+  // image decodes, instead of reflowing once it lands.
+  fullWidth: entry.data.cover
+    ? Math.min(FULL_WIDTH, entry.data.cover.width)
+    : null,
+  fullHeight: entry.data.cover
+    ? Math.round(
+        (entry.data.cover.height *
+          Math.min(FULL_WIDTH, entry.data.cover.width)) /
+          entry.data.cover.width
+      )
+    : null,
+  Content: (await render(entry)).Content,
+});
+
+// The ids are matched by the show/hide selectors in the stylesheet below.
+const categories = [
+  { id: 'personal', label: 'Personal', icon: 'ph:user-bold' },
+  { id: 'professional', label: 'Professional', icon: 'ph:briefcase-bold' },
+] as const;
+
+const tabs = await Promise.all(
+  categories.map(async (category) => {
+    const projects = await Promise.all(
+      entries
+        .filter((entry) => entry.data.category === category.id)
+        .slice(0, MAX_PROJECTS)
+        .map(toCard)
+    );
+    return { ...category, projects };
+  })
+);
 ---
 
 <section id="work" class="section work">
   <div class="section-head" data-reveal>
     <h2>Selected work</h2>
-    <span class="mono count">{count} projects</span>
+
+    <fieldset class="switch tabs">
+      <legend class="visually-hidden">Show projects</legend>
+      {
+        tabs.map((tab, i) => (
+          <label class="switch-option">
+            <input
+              type="radio"
+              name="work-category"
+              value={tab.id}
+              checked={i === 0}
+              class="visually-hidden"
+            />
+            <Icon name={tab.icon} aria-hidden="true" />
+            {tab.label}
+          </label>
+        ))
+      }
+    </fieldset>
   </div>
 
-  <div class="grid">
-    {
-      projects.map(({ Content, ...project }) => (
-        <article class="project" data-reveal>
-          <div class="project-inner">
-            {
-              project.cover ? (
-                <button
-                  type="button"
-                  class="shot shot-btn"
-                  data-lightbox
-                  data-full={project.full}
-                  data-full-w={project.fullWidth}
-                  data-full-h={project.fullHeight}
-                  data-alt={project.coverAlt!}
-                  aria-label={`Open the ${project.title} cover full size`}
-                >
-                  <Image
-                    class="shot-img"
-                    src={project.cover}
-                    alt={project.coverAlt!}
-                    widths={[400, 700, 1000]}
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                    loading="lazy"
-                  />
-                </button>
-              ) : (
-                <div class="plate shot">
-                  <span class="plate-caption mono">{project.shot}</span>
+  {
+    tabs.map((tab) => (
+      <div class="grid" data-category={tab.id}>
+        {tab.projects.length === 0 && (
+          <p class="empty mono">Nothing here yet.</p>
+        )}
+        {
+          tab.projects.map(({ Content, ...project }) => (
+            <article class="project" data-reveal>
+              <div class="project-inner">
+                {
+                  project.cover ? (
+                    <button
+                      type="button"
+                      class="shot shot-btn"
+                      data-lightbox
+                      data-full={project.full}
+                      data-full-w={project.fullWidth}
+                      data-full-h={project.fullHeight}
+                      data-alt={project.coverAlt!}
+                      aria-label={`Open the ${project.title} cover full size`}
+                    >
+                      <Image
+                        class="shot-img"
+                        src={project.cover}
+                        alt={project.coverAlt!}
+                        widths={[400, 700, 1000]}
+                        sizes="(max-width: 640px) 100vw, 50vw"
+                        loading="lazy"
+                      />
+                    </button>
+                  ) : (
+                    <div class="plate shot">
+                      <span class="plate-caption mono">{project.shot}</span>
+                    </div>
+                  )
+                }
+
+                <div class="body">
+                  <div class="meta mono">
+                    <span>{project.num}</span>
+                    <span class="meta-sub">
+                      {project.year} — {project.role}
+                    </span>
+                  </div>
+
+                  <h3 class="title">{project.title}</h3>
+
+                  <div class="blurb">
+                    <Content />
+                  </div>
+
+                  <ul class="stack">
+                    {project.stack.map((item) => (
+                      <li class="chip">{item}</li>
+                    ))}
+                  </ul>
+
+                  {project.repo && (
+                    <a
+                      href={project.repo}
+                      class="btn-nb btn-nb--tint btn-nb--lift repo"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${project.title} source on GitHub`}
+                    >
+                      <Icon name="ph:github-logo-bold" aria-hidden="true" />
+                      Repo
+                    </a>
+                  )}
                 </div>
-              )
-            }
-
-            <div class="body">
-              <div class="meta mono">
-                <span>{project.num}</span>
-                <span class="meta-sub">
-                  {project.year} — {project.role}
-                </span>
               </div>
-
-              <h3 class="title">{project.title}</h3>
-
-              <div class="blurb">
-                <Content />
-              </div>
-
-              <ul class="stack">
-                {project.stack.map((item) => (
-                  <li class="chip">{item}</li>
-                ))}
-              </ul>
-
-              {project.repo && (
-                <a
-                  href={project.repo}
-                  class="btn-nb btn-nb--tint btn-nb--lift repo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${project.title} source on GitHub`}
-                >
-                  <Icon name="ph:github-logo-bold" aria-hidden="true" />
-                  Repo
-                </a>
-              )}
-            </div>
-          </div>
-        </article>
-      ))
-    }
-  </div>
+            </article>
+          ))
+        }
+      </div>
+    ))
+  }
 
   <dialog class="lightbox" data-lightbox-dialog aria-label="Project cover">
     <button
@@ -146,18 +189,33 @@ const count = String(projects.length).padStart(2, '0');
 
 <style>
   .work {
-    padding-top: 40px;
+    padding-top: 96px;
   }
 
-  .count {
-    color: var(--ink-3);
-    padding-bottom: 8px;
+  .tabs {
+    margin-bottom: 6px;
   }
 
   .grid {
     display: grid;
     gap: 34px;
     margin-top: 44px;
+  }
+
+  /* Personal is the default, so a browser without :has still lists it. */
+  [data-category='professional'],
+  .work:has(input[value='professional']:checked) [data-category='personal'] {
+    display: none;
+  }
+
+  .work:has(input[value='professional']:checked)
+    [data-category='professional'] {
+    display: grid;
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--ink-3);
   }
 
   .project {

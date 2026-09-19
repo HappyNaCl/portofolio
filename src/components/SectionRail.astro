@@ -1,8 +1,8 @@
 ---
 const sections = [
   { id: 'top', href: '#top', label: 'Intro' },
-  { id: 'work', href: '#work', label: 'Work' },
   { id: 'about', href: '#about', label: 'About' },
+  { id: 'work', href: '#work', label: 'Work' },
   { id: 'cv', href: '#cv', label: 'Résumé' },
   { id: 'contact', href: '#contact', label: 'Contact' },
 ];
@@ -60,11 +60,6 @@ const sections = [
       color 0.15s ease;
   }
 
-  .rail:hover .rail-pill,
-  .rail:focus-within .rail-pill {
-    width: 104px;
-    gap: 8px;
-  }
 
   .rail-pill:hover {
     background: var(--cyan-tint);
@@ -98,10 +93,6 @@ const sections = [
     transition: opacity 0.18s ease 0.04s;
   }
 
-  .rail:hover .rail-label,
-  .rail:focus-within .rail-label {
-    opacity: 1;
-  }
 
   .rail-dot {
     flex: 0 0 auto;
@@ -111,6 +102,22 @@ const sections = [
     background: var(--ink-3);
   }
 
+  /* Hover-to-expand only where there is room beside the content and a
+     pointer to hover with. */
+  @media (min-width: 721px) {
+    .rail:hover .rail-pill,
+    .rail:focus-within .rail-pill {
+      width: 104px;
+      gap: 8px;
+    }
+
+    .rail:hover .rail-label,
+    .rail:focus-within .rail-label {
+      opacity: 1;
+    }
+  }
+
+  /* No room beside the content on phones; the page is a single scroll. */
   @media (max-width: 720px) {
     .rail {
       display: none;
